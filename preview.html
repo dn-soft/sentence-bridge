@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>문장 다리 — 캐릭터 동작 미리보기</title>
+<style>
+  :root { --bg: #F4F1FA; --panel: #FFFFFF; --ink: #2B2140; --sub: #6B5E80; --line: #E2DCEE; --gold: #FFC93C; --accent: #2391E1; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: #231C45; color: #FFF3DA; padding: 12px 18px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+  header h1 { font-size: 20px; margin: 0 12px 0 0; }
+  header label { font-size: 14px; font-weight: 700; display: flex; gap: 6px; align-items: center; }
+  select, button { font: inherit; font-size: 14px; font-weight: 700; border-radius: 10px; border: 0; padding: 7px 12px; background: #FFF3DA; color: var(--ink); cursor: pointer; }
+  button.on { background: var(--gold); }
+  main { padding: 16px 18px 40px; max-width: 1400px; margin: 0 auto; }
+  .note { background: #FFF8E6; border: 2px solid #F2D79A; border-radius: 12px; padding: 10px 14px; font-size: 14px; line-height: 1.6; margin-bottom: 14px; }
+  .note code { background: #fff; padding: 1px 5px; border-radius: 5px; }
+  table.grid { border-collapse: separate; border-spacing: 8px; width: 100%; }
+  .grid th { font-size: 15px; text-align: left; color: var(--sub); font-weight: 800; }
+  .grid th.ch { text-align: center; font-size: 18px; color: var(--ink); }
+  .grid td.lab { width: 170px; font-size: 14px; font-weight: 800; vertical-align: middle; }
+  .grid td.lab small { display: block; color: var(--sub); font-weight: 600; }
+  .cell { background: var(--panel); border-radius: 12px; box-shadow: 0 1px 0 var(--line), inset 0 0 0 1px var(--line); padding: 6px; text-align: center; }
+  .cell canvas { image-rendering: pixelated; display: block; margin: 0 auto; }
+  .cell .strip { display: block; margin: 6px auto 0; image-rendering: pixelated; max-width: 100%; }
+  .cell .fi { font-size: 11px; color: var(--sub); font-weight: 700; }
+  body.bg-sky .cell canvas { background: linear-gradient(#7CCBFF, #DDF5FF); }
+  body.bg-dark .cell canvas { background: #231C45; }
+  body.bg-check .cell canvas { background: repeating-conic-gradient(#E6E2EF 0 25%, #F7F5FB 0 50%) 0 0 / 16px 16px; }
+  section { margin-top: 26px; }
+  section h2 { font-size: 20px; margin: 0 0 10px; }
+  .sheets { display: flex; gap: 16px; flex-wrap: wrap; }
+  .sheets figure { margin: 0; background: var(--panel); border-radius: 12px; padding: 10px; box-shadow: inset 0 0 0 1px var(--line); }
+  .sheets figcaption { font-weight: 800; margin-bottom: 6px; }
+  .sheets canvas { image-rendering: pixelated; }
+  .drop { border: 3px dashed #C9BEDF; border-radius: 12px; padding: 14px; text-align: center; font-weight: 800; color: var(--sub); margin-bottom: 14px; }
+  .drop.over { border-color: var(--accent); color: var(--accent); background: #EAF4FF; }
+  .ok { color: #2E8A5A; } .warn { color: #B0461A; }
+  .cmp { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .cmp figure { margin: 0; background: var(--panel); border-radius: 12px; padding: 10px; box-shadow: inset 0 0 0 1px var(--line); }
+  .cmp img { max-width: 100%; display: block; image-rendering: auto; }
+</style>
+</head>
+<body class="bg-check">
+<header>
+  <h1>캐릭터 동작 미리보기</h1>
+  <label>크기 <select id="scale"><option>2</option><option selected>3</option><option>4</option><option>6</option><option>8</option></select>배</label>
+  <label>속도 <select id="speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+  <label>배경 <select id="bg"><option value="check" selected>체크</option><option value="sky">하늘</option><option value="dark">어둡게</option></select></label>
+  <button id="play" class="on">▶ 재생 중</button>
+  <button id="step">한 프레임 ▶|</button>
+  <button id="strips">프레임 펼쳐 보기</button>
+</header>
+<main>
+  <div class="note">
+    이 페이지는 <code>assets/sprites/manifest.js</code>와 <code>assets/sprites/*.png</code>를 그대로 읽어 모든 동작을 돌린다(게임과 같은 파일).
+    디자이너가 새 PNG를 만들면 아래 칸에 <b>끌어다 놓아</b> 저장 전에 미리 볼 수 있다. 칸 크기 40×40, 발 닿는 점 (20, 38), 줄 = 동작, 칸 = 프레임.
+  </div>
+  <div class="drop" id="drop">여기에 <b>tomi.png / vesta.png / bansuk.png</b> 를 끌어다 놓으면 바로 바꿔서 보여줘요 (파일 이름으로 캐릭터를 구분)<div id="dropmsg"></div></div>
+  <table class="grid" id="grid"></table>
+  <section>
+    <h2>스프라이트 시트 전체</h2>
+    <div class="sheets" id="sheets"></div>
+  </section>
+  <section>
+    <h2>원본 그림과 비교</h2>
+    <div class="cmp">
+      <!-- 배포 사이트에는 docs/가 없으므로(원본 그림 비공개) 그림이 없으면 이 칸을 숨긴다 -->
+      <figure><img src="docs/images/compare-tomi.png" alt="토미 원본과 스프라이트 비교" onerror="this.closest('section').remove()"><figcaption>토미</figcaption></figure>
+      <figure><img src="docs/images/compare-vesta.png" alt="베스타 원본과 스프라이트 비교" onerror="this.closest('section').remove()"><figcaption>베스타</figcaption></figure>
+      <figure><img src="docs/images/compare-bansuk.png" alt="반숙펫 원본과 스프라이트 비교" onerror="this.closest('section').remove()"><figcaption>반숙펫</figcaption></figure>
+    </div>
+  </section>
+</main>
+<script src="assets/sprites/manifest.js"></script>
+<script>
+(function () {
+  'use strict';
+  var M = window.SB_SPRITES;
+  var sheets = {}, cells = [], playing = true, t = 0, speed = 1, scale = 3, showStrips = false;
+  var ids = Object.keys(M.characters);
+  var anims = Object.keys(M.animations).sort(function (a, b) { return M.animations[a].row - M.animations[b].row; });
+  var $ = function (id) { return document.getElementById(id); };
+
+  function load(id, src) {
+    return new Promise(function (res) { var i = new Image(); i.onload = function () { sheets[id] = i; res(); }; i.onerror = function () { res(); }; i.src = src; });
+  }
+  function build() {
+    var g = $('grid');
+    g.innerHTML = '';
+    var hr = document.createElement('tr');
+    hr.innerHTML = '<th>동작</th>' + ids.map(function (id) { return '<th class="ch">' + M.characters[id].name + '</th>'; }).join('');
+    g.appendChild(hr);
+    cells = [];
+    anims.forEach(function (name) {
+      var a = M.animations[name];
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td class="lab">' + name + '<small>' + a.ko + ' · ' + a.frames + '프레임 · ' + a.fps + 'fps · ' + (a.loop ? '반복' : '한 번') + '</small></td>';
+      ids.forEach(function (id) {
+        var td = document.createElement('td');
+        td.className = 'cell';
+        var c = document.createElement('canvas');
+        c.width = M.frameWidth * scale; c.height = M.frameHeight * scale;
+        td.appendChild(c);
+        var fi = document.createElement('div'); fi.className = 'fi'; td.appendChild(fi);
+        var strip = null;
+        if (showStrips) {
+          strip = document.createElement('canvas');
+          strip.className = 'strip';
+          strip.width = M.frameWidth * a.frames * 2; strip.height = M.frameHeight * 2;
+          td.appendChild(strip);
+        }
+        tr.appendChild(td);
+        var cx = c.getContext('2d'); cx.imageSmoothingEnabled = false;
+        cells.push({ id: id, name: name, a: a, cx: cx, c: c, fi: fi, strip: strip });
+      });
+      g.appendChild(tr);
+    });
+    drawStrips();
+    drawSheets();
+  }
+  function frameAt(a, tt) { var f = Math.floor(tt * a.fps); return a.loop ? f % a.frames : Math.min(f % (a.frames + Math.round(a.fps * 0.8)), a.frames - 1); }
+  function draw() {
+    cells.forEach(function (k) {
+      var img = sheets[k.id]; k.cx.clearRect(0, 0, k.c.width, k.c.height);
+      if (!img) return;
+      var f = frameAt(k.a, t);
+      k.cx.drawImage(img, f * M.frameWidth, k.a.row * M.frameHeight, M.frameWidth, M.frameHeight, 0, 0, M.frameWidth * scale, M.frameHeight * scale);
+      k.cx.fillStyle = 'rgba(80,160,90,.35)'; k.cx.fillRect(0, M.anchorY * scale, k.c.width, 1);
+      k.fi.textContent = (f + 1) + ' / ' + k.a.frames;
+    });
+  }
+  function drawStrips() {
+    cells.forEach(function (k) {
+      if (!k.strip || !sheets[k.id]) return;
+      var sx = k.strip.getContext('2d'); sx.imageSmoothingEnabled = false;
+      sx.clearRect(0, 0, k.strip.width, k.strip.height);
+      sx.drawImage(sheets[k.id], 0, k.a.row * M.frameHeight, M.frameWidth * k.a.frames, M.frameHeight, 0, 0, k.strip.width, k.strip.height);
+    });
+  }
+  function drawSheets() {
+    var box = $('sheets'); box.innerHTML = '';
+    ids.forEach(function (id) {
+      var img = sheets[id]; if (!img) return;
+      var f = document.createElement('figure');
+      f.innerHTML = '<figcaption>' + M.characters[id].name + ' — ' + M.characters[id].sheet + ' (' + img.width + '×' + img.height + ')</figcaption>';
+      var c = document.createElement('canvas'); c.width = img.width * 2; c.height = img.height * 2;
+      var x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(img, 0, 0, c.width, c.height);
+      x.strokeStyle = 'rgba(120,100,160,.25)';
+      for (var i = 0; i <= M.columns; i++) { x.beginPath(); x.moveTo(i * M.frameWidth * 2 + .5, 0); x.lineTo(i * M.frameWidth * 2 + .5, c.height); x.stroke(); }
+      for (var j = 0; j <= anims.length; j++) { x.beginPath(); x.moveTo(0, j * M.frameHeight * 2 + .5); x.lineTo(c.width, j * M.frameHeight * 2 + .5); x.stroke(); }
+      f.appendChild(c); box.appendChild(f);
+    });
+  }
+  var last = performance.now();
+  function loop(now) {
+    requestAnimationFrame(loop);
+    var dt = Math.min(0.1, (now - last) / 1000); last = now;
+    if (playing) t += dt * speed;
+    draw();
+  }
+  $('scale').onchange = function () { scale = +this.value; build(); };
+  $('speed').onchange = function () { speed = +this.value; };
+  $('bg').onchange = function () { document.body.className = 'bg-' + this.value; };
+  $('play').onclick = function () { playing = !playing; this.classList.toggle('on', playing); this.textContent = playing ? '▶ 재생 중' : '❚❚ 멈춤'; };
+  $('step').onclick = function () { playing = false; $('play').classList.remove('on'); $('play').textContent = '❚❚ 멈춤'; t = (Math.floor(t * 12) + 1) / 12; };
+  $('strips').onclick = function () { showStrips = !showStrips; this.classList.toggle('on', showStrips); build(); };
+  // 새 PNG 끌어다 놓기 (저장하지 않고 이 화면에서만 바꿔 본다)
+  var drop = $('drop');
+  ['dragenter', 'dragover'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (e) { drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (ev) {
+    var files = [].slice.call(ev.dataTransfer.files);
+    var msgs = [];
+    Promise.all(files.map(function (f) {
+      var id = ids.filter(function (i) { return f.name.toLowerCase().indexOf(i) === 0; })[0];
+      if (!id) { msgs.push('<span class="warn">' + f.name + ': 이름이 tomi/vesta/bansuk 로 시작해야 해요</span>'); return null; }
+      var url = URL.createObjectURL(f);
+      return load(id, url).then(function () {
+        var img = sheets[id], okW = M.columns * M.frameWidth, okH = anims.length * M.frameHeight;
+        msgs.push(img.width === okW && img.height === okH ? '<span class="ok">' + f.name + ' → ' + M.characters[id].name + ' (' + img.width + '×' + img.height + ') 적용</span>'
+          : '<span class="warn">' + f.name + ': 크기가 ' + img.width + '×' + img.height + '예요. ' + okW + '×' + okH + '이어야 해요</span>');
+      });
+    })).then(function () { $('dropmsg').innerHTML = msgs.join('<br>'); drawStrips(); drawSheets(); });
+  });
+  Promise.all(ids.map(function (id) { return load(id, M.characters[id].sheet); })).then(function () { build(); requestAnimationFrame(loop); });
+})();
+</script>
+</body>
+</html>

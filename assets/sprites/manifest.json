@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "note": "PNG만 바꿔 끼울 때는 이 파일을 고칠 필요 없음. 프레임 수를 바꾸면 frames 숫자를 같이 고친다.",
+  "frameWidth": 40,
+  "frameHeight": 40,
+  "anchorX": 20,
+  "anchorY": 38,
+  "columns": 8,
+  "animations": {
+    "idle": {
+      "row": 0,
+      "frames": 6,
+      "fps": 6,
+      "loop": true,
+      "ko": "서 있기"
+    },
+    "idle_long": {
+      "row": 1,
+      "frames": 8,
+      "fps": 4,
+      "loop": true,
+      "ko": "오래 기다림"
+    },
+    "run": {
+      "row": 2,
+      "frames": 8,
+      "fps": 12,
+      "loop": true,
+      "ko": "달리기"
+    },
+    "skid": {
+      "row": 3,
+      "frames": 3,
+      "fps": 12,
+      "loop": false,
+      "ko": "멈춤/방향 바꾸기"
+    },
+    "jump": {
+      "row": 4,
+      "frames": 2,
+      "fps": 10,
+      "loop": false,
+      "ko": "점프 올라감"
+    },
+    "fall": {
+      "row": 5,
+      "frames": 2,
+      "fps": 8,
+      "loop": true,
+      "ko": "떨어짐"
+    },
+    "land": {
+      "row": 6,
+      "frames": 3,
+      "fps": 15,
+      "loop": false,
+      "ko": "착지"
+    },
+    "joy": {
+      "row": 7,
+      "frames": 8,
+      "fps": 12,
+      "loop": false,
+      "ko": "정답 기쁨"
+    },
+    "oops": {
+      "row": 8,
+      "frames": 8,
+      "fps": 12,
+      "loop": false,
+      "ko": "오답 비틀"
+    },
+    "hint": {
+      "row": 9,
+      "frames": 6,
+      "fps": 10,
+      "loop": false,
+      "ko": "힌트 받음"
+    },
+    "listen": {
+      "row": 10,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "ko": "소리 듣기"
+    },
+    "push": {
+      "row": 11,
+      "frames": 4,
+      "fps": 8,
+      "loop": true,
+      "ko": "벽 밀기"
+    },
+    "ride": {
+      "row": 12,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "ko": "풍선 타기"
+    },
+    "rescue": {
+      "row": 13,
+      "frames": 4,
+      "fps": 6,
+      "loop": true,
+      "ko": "방울 구조"
+    },
+    "clear": {
+      "row": 14,
+      "frames": 8,
+      "fps": 10,
+      "loop": true,
+      "ko": "스테이지 클리어"
+    },
+    "select_idle": {
+      "row": 15,
+      "frames": 8,
+      "fps": 8,
+      "loop": true,
+      "ko": "선택 화면 대기"
+    },
+    "select_chosen": {
+      "row": 16,
+      "frames": 8,
+      "fps": 12,
+      "loop": false,
+      "ko": "선택됨"
+    }
+  },
+  "characters": {
+    "tomi": {
+      "name": "토미",
+      "color": "#FF7664",
+      "rideAnchor": [
+        34,
+        12
+      ],
+      "headTop": 10,
+      "desc": "다리 없는 기록 로봇. 통통 떠서 미끄러지듯 움직여요.",
+      "sheet": "assets/sprites/tomi.png"
+    },
+    "vesta": {
+      "name": "베스타",
+      "color": "#2391E1",
+      "rideAnchor": [
+        28,
+        25
+      ],
+      "headTop": 10,
+      "desc": "행성 베스타의 별 요정. 짧은 다리로 또박또박 달려요.",
+      "sheet": "assets/sprites/vesta.png"
+    },
+    "bansuk": {
+      "name": "반숙펫",
+      "color": "#FAEA5A",
+      "rideAnchor": [
+        20,
+        8
+      ],
+      "headTop": 10,
+      "desc": "말은 \"뀨\"만 해요. 말랑말랑 통통 튀어요.",
+      "sheet": "assets/sprites/bansuk.png"
+    }
+  }
+}

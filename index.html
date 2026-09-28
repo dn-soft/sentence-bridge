@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#231C45">
+<meta name="description" content="알공 영어 — 문장을 완성하면 다리가 생기는 횡스크롤 게임">
+<title>문장 다리 — 알공 영어</title>
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+<div id="app">
+  <div id="stage"><canvas id="game" aria-label="게임 화면"></canvas></div>
+
+  <!-- 게임 중 화면 -->
+  <div id="hud" hidden>
+    <div id="hud-top">
+      <button class="icon-btn" id="btn-pause" aria-label="잠깐 멈추기" title="잠깐 멈추기 (Esc)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/></svg>
+      </button>
+      <div id="prompt" aria-live="polite">
+        <div id="prompt-kind"></div>
+        <div id="prompt-main"></div>
+        <div id="prompt-slots"></div>
+      </div>
+      <button class="icon-btn big" id="btn-listen" aria-label="다시 듣기" title="다시 듣기 (S)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16 8.5c1.2 1 1.8 2.2 1.8 3.5s-.6 2.5-1.8 3.5" fill="none" stroke-width="2.2" stroke-linecap="round"/><path class="wave" d="M18.5 6c2 1.6 3 3.6 3 6s-1 4.4-3 6" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="hud-bottom">
+      <div id="progress" aria-label="진행"></div>
+      <div id="starcount"><span class="star">★</span> <b id="starnum">0</b></div>
+    </div>
+    <div id="toast" role="status"></div>
+  </div>
+
+  <div id="touch" hidden>
+    <div class="pad pad-left">
+      <button id="t-left" aria-label="왼쪽으로"><svg viewBox="0 0 24 24"><path d="M15 5 7 12l8 7z"/></svg></button>
+      <button id="t-right" aria-label="오른쪽으로"><svg viewBox="0 0 24 24"><path d="m9 5 8 7-8 7z"/></svg></button>
+    </div>
+    <div class="pad pad-right">
+      <button id="t-jump" aria-label="점프">점프</button>
+    </div>
+  </div>
+
+  <!-- 첫 화면 -->
+  <section class="screen" id="scr-title">
+    <div class="title-wrap">
+      <h1 class="logo" aria-label="문장 다리">
+        <span class="lb">문</span><span class="lb">장</span><span class="gap"></span><span class="lb">다</span><span class="lb">리</span>
+      </h1>
+      <p class="sub">영어 문장을 만들면 <b>다리</b>가 생겨요!</p>
+      <div class="title-chars" id="title-chars"></div>
+      <button class="btn primary huge" id="btn-start">시작하기</button>
+      <div class="title-foot">
+        <button class="btn small ghost" id="btn-help">놀이 방법</button>
+        <button class="btn small ghost" id="btn-sound-title" aria-pressed="true">소리 켜짐</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 캐릭터 고르기 -->
+  <section class="screen" id="scr-char" hidden>
+    <div class="panel wide">
+      <h2>누구랑 같이 갈까요?</h2>
+      <div class="char-cards" id="char-cards" role="listbox" aria-label="캐릭터"></div>
+      <div class="row">
+        <button class="btn ghost" id="btn-char-back">◀ 처음으로</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 단원 고르기 -->
+  <section class="screen" id="scr-stage" hidden>
+    <div class="panel wide">
+      <h2>무엇을 공부할까요?</h2>
+      <div class="tabs" id="pub-tabs" role="tablist" aria-label="교과서"></div>
+      <div class="grades" id="grade-btns" role="tablist" aria-label="학년"></div>
+      <div class="units" id="unit-grid"></div>
+      <div class="row">
+        <button class="btn ghost" id="btn-stage-back">◀ 캐릭터 다시 고르기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 출발 전 안내 -->
+  <section class="screen" id="scr-intro" hidden>
+    <div class="panel">
+      <div class="intro-head">
+        <canvas id="intro-char" width="60" height="60"></canvas>
+        <div>
+          <div class="intro-unit" id="intro-unit"></div>
+          <div class="intro-topic" id="intro-topic"></div>
+          <div class="intro-meta" id="intro-meta"></div>
+        </div>
+      </div>
+      <ol class="howto">
+        <li><span class="ico">📖</span><span>위에 나온 <b>뜻</b>을 읽고 <b>소리</b>를 들어요.</span></li>
+        <li><span class="ico">🧱</span><span>낱말 블록을 <b>문장 순서대로</b> 밟아요. 블록 밑에서 점프하면 올라가요.</span></li>
+        <li><span class="ico">🌉</span><span>문장이 다 맞으면 <b>다리</b>가 생겨요. 건너가요!</span></li>
+        <li><span class="ico">🎈</span><span>그림 벽 앞에서는 <b>그림에 맞는 낱말 풍선</b>을 잡아요.</span></li>
+      </ol>
+      <div class="keys" id="intro-keys"></div>
+      <div class="row actions">
+        <button class="btn ghost" id="btn-intro-back">◀ 단원 고르기</button>
+        <button class="btn primary big" id="btn-go">출발!</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 잠깐 멈춤 -->
+  <section class="screen dim" id="scr-pause" hidden>
+    <div class="panel small">
+      <h2>잠깐 쉬어요</h2>
+      <div class="col">
+        <button class="btn primary big" id="btn-resume">계속하기</button>
+        <button class="btn" id="btn-restart">처음부터 다시</button>
+        <button class="btn" id="btn-to-stage">단원 고르기</button>
+        <div class="row tight">
+          <button class="btn small toggle" id="btn-music" aria-pressed="true">배경음악 켜짐</button>
+          <button class="btn small toggle" id="btn-sfx" aria-pressed="true">효과음 켜짐</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 결과 -->
+  <section class="screen" id="scr-result" hidden>
+    <div class="panel wide result">
+      <div class="result-head">
+        <canvas id="result-char" width="60" height="60"></canvas>
+        <div>
+          <h2 id="result-title">스테이지 클리어!</h2>
+          <div class="result-stars" id="result-stars"></div>
+          <p class="result-msg" id="result-msg"></p>
+        </div>
+      </div>
+      <div class="result-stats" id="result-stats"></div>
+      <h3>모은 낱말 <small>(누르면 소리가 나요)</small></h3>
+      <div class="word-book" id="word-book"></div>
+      <h3>만든 문장</h3>
+      <ul class="sentence-list" id="sentence-list"></ul>
+      <div class="row actions">
+        <button class="btn" id="btn-units">단원 고르기</button>
+        <button class="btn" id="btn-again">다른 문장으로 또 하기</button>
+        <button class="btn primary big" id="btn-next">다음 단원 ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 놀이 방법 -->
+  <section class="screen dim" id="scr-help" hidden>
+    <div class="panel">
+      <h2>놀이 방법</h2>
+      <ol class="howto">
+        <li><span class="ico">🧱</span><span>뜻을 보고, 소리를 듣고, 낱말 블록을 <b>문장 순서대로</b> 밟아요.</span></li>
+        <li><span class="ico">🌉</span><span>문장이 완성되면 다리가 생겨서 건널 수 있어요.</span></li>
+        <li><span class="ico">🎈</span><span>그림 벽 앞에서는 그림에 맞는 낱말 풍선을 잡으면 벽을 넘어가요.</span></li>
+        <li><span class="ico">💡</span><span>틀려도 괜찮아요. 두 번 틀리면 맞는 블록이 반짝여요.</span></li>
+        <li><span class="ico">💧</span><span>구덩이에 빠지면 방울이 구해 줘요.</span></li>
+      </ol>
+      <div class="keys" id="help-keys"></div>
+      <div class="row actions"><button class="btn primary" id="btn-help-close">알겠어요!</button></div>
+    </div>
+  </section>
+
+  <div id="loading" hidden><div class="spinner"></div><p id="loading-text">준비하고 있어요…</p></div>
+  <div id="rotate-tip" hidden>화면을 <b>가로</b>로 돌리면 더 크게 보여요</div>
+</div>
+
+<script src="js/sb-core.js"></script>
+<script src="js/sb-content.js"></script>
+<script src="js/sb-font.js"></script>
+<script src="js/sb-physics.js"></script>
+<script src="js/sb-level.js"></script>
+<script src="js/sb-sim.js"></script>
+<script src="js/sb-bot.js"></script>
+<script src="js/sb-art.js"></script>
+<script src="js/sb-render.js"></script>
+<script src="js/sb-audio.js"></script>
+<script src="assets/sprites/manifest.js"></script>
+<script src="data/catalog.js"></script>
+<script src="js/sb-ui.js"></script>
+<script src="js/sb-main.js"></script>
+</body>
+</html>
